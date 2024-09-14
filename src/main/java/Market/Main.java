@@ -13,15 +13,13 @@ public class Main {
         Algorithm algorithm = new NSGAIII(problem);
             algorithm.step();
 
-
-
         NondominatedPopulation population = algorithm.getResult();
 
         Solution bestSolution = null;
         double bestScore = 0;
 
-        double weightMarketShare = 0.5;
-        double weightProfit = 0.5;
+        double weightMarketShare = 0.2;
+        double weightProfit = 1;
 
         for (Solution solution : population) {
 
