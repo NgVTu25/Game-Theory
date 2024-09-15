@@ -1,16 +1,22 @@
 package Market;
 
 import org.moeaframework.algorithm.NSGAIII;
-import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.spi.AlgorithmFactory;
 import org.moeaframework.core.variable.EncodingUtils;
 
 public class Main {
     public static void main(String[] args) {
         MarketCompetitionProblem problem = new MarketCompetitionProblem();
 
-        Algorithm algorithm = new NSGAIII(problem);
+
+
+        NSGAIII algorithm = (NSGAIII) AlgorithmFactory.getInstance().getAlgorithm(
+                "NSGAIII", problem
+        );
+
+
         algorithm.step();
 
         NondominatedPopulation population = algorithm.getResult();

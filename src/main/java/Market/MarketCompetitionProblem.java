@@ -15,8 +15,6 @@ public class MarketCompetitionProblem extends AbstractProblem {
     public static final double Discount = 0.05;
     public static final double No_Discount = 0.1;
 
-    // Total market size
-    public static final int Market = 100;
 
     // Initial market share for each company (25% each at the start)
     public static final double Initial_Market_Share = 25.0;
@@ -50,11 +48,11 @@ public class MarketCompetitionProblem extends AbstractProblem {
         // Adjust market share based on strategies and competition
         for (int i = 0; i < Number_Of_Company; i++) {
             marketShares[i] = calculateMarketShare(strategies[i], marketShares, i);
-            profits[i] = calculateProfit(marketShares[i],strategies[i]);
         }
 
         // Set objectives (negative because it's a minimization problem)
         for (int i = 0; i < Number_Of_Company; i++) {
+            profits[i] = calculateProfit(marketShares[i],strategies[i]);
             // Objective 1: maximize market share (convert to negative for minimization)
             solution.setObjective(i, -marketShares[i]);
 
@@ -85,18 +83,23 @@ public class MarketCompetitionProblem extends AbstractProblem {
         double newTotalMarketShare = totalMarketShare - currentMarketShares[companyIndex] + adjustedMarketShare;
 
         // If the new total market share exceeds 100%, adjust the individual market shares
+        // If the new total market share exceeds 100%, adjust the individual market shares
         if (newTotalMarketShare > maxMarketShare) {
             double excess = newTotalMarketShare - maxMarketShare;
 
             // Distribute the excess proportionally to other companies
             for (int i = 0; i < Number_Of_Company; i++) {
                 if (i != companyIndex) {
-                    currentMarketShares[i] -= (currentMarketShares[i] / totalMarketShare) * excess;
+                    double reduction = (currentMarketShares[i] / (totalMarketShare - currentMarketShares[companyIndex])) * excess;
+                    currentMarketShares[i] = Math.max(0, currentMarketShares[i] - reduction);
                 }
             }
 
-            adjustedMarketShare = currentMarketShares[companyIndex] + adjustedMarketShare;
+            // Adjust the current company's market share accordingly
+            currentMarketShares[companyIndex] = maxMarketShare -
+                    Arrays.stream(currentMarketShares).sum() + currentMarketShares[companyIndex];
         }
+
 
         return adjustedMarketShare;
     }
@@ -108,13 +111,13 @@ public class MarketCompetitionProblem extends AbstractProblem {
 
         // Modify baseProfit based on strategy if needed
         if (strategy == 0) { // Campaign and discount
-            baseProfit -= (Campaign + Discount) * marketShare * Profit_Percentage_Per_Market_Share;
+            baseProfit = baseProfit - (Discount) * marketShare * Profit_Percentage_Per_Market_Share;
         } else if (strategy == 1) { // No Campaign and discount
 
         } else if (strategy == 2) { // Discount only
             baseProfit -= Discount * marketShare * Profit_Percentage_Per_Market_Share;
         } else if (strategy == 3) { // No Discount
-            baseProfit -= marketShare * Campaign * Profit_Percentage_Per_Market_Share;
+            baseProfit -= marketShare * Profit_Percentage_Per_Market_Share;
         }
 
         // Ensure profit doesn't go below zero (or apply any other constraints if needed)
