@@ -11,7 +11,7 @@ public class Main {
         MarketCompetitionProblem problem = new MarketCompetitionProblem();
 
         Algorithm algorithm = new NSGAIII(problem);
-            algorithm.step();
+        algorithm.step();
 
         NondominatedPopulation population = algorithm.getResult();
 
