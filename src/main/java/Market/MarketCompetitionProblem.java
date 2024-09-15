@@ -15,6 +15,15 @@ public class MarketCompetitionProblem extends AbstractProblem {
     public static final double Discount = 0.05;
     public static final double No_Discount = 0.1;
 
+    public static final int CAMPAIGN_DISCOUNT = 0;
+    public static final int NO_CAMPAIGN_DISCOUNT = 1;
+
+    public static final int NO_CAMPAIGN_NO_DISCOUNT = 2;
+    public static final int CAMPAIGN_NO_DISCOUNT = 3;
+
+
+
+
 
     // Initial market share for each company (25% each at the start)
     public static final double Initial_Market_Share = 25.0;
@@ -109,15 +118,26 @@ public class MarketCompetitionProblem extends AbstractProblem {
         // Adjust profit based on marketing costs, which increase with market share
         double baseProfit = marketShare * Profit_Percentage_Per_Market_Share;
 
-        // Modify baseProfit based on strategy if needed
-        if (strategy == 0) { // Campaign and discount
-            baseProfit = baseProfit - (Discount) * marketShare * Profit_Percentage_Per_Market_Share;
-        } else if (strategy == 1) { // No Campaign and discount
+        // Use switch-case to handle strategy
+        switch (strategy) {
+            case CAMPAIGN_DISCOUNT: // Campaign and discount
+                baseProfit -= Discount * marketShare * Base_Marketing_Cost;
+                break;
 
-        } else if (strategy == 2) { // Discount only
-            baseProfit -= Discount * marketShare * Profit_Percentage_Per_Market_Share;
-        } else if (strategy == 3) { // No Discount
-            baseProfit -= marketShare * Profit_Percentage_Per_Market_Share;
+            case NO_CAMPAIGN_DISCOUNT: // No Campaign and discount
+                // No adjustments needed
+                break;
+
+            case NO_CAMPAIGN_NO_DISCOUNT: // Discount only
+                baseProfit -= Discount * marketShare * Base_Marketing_Cost;
+                break;
+
+            case CAMPAIGN_NO_DISCOUNT: // No Discount
+                baseProfit -= marketShare * Base_Marketing_Cost;
+                break;
+
+            default:
+                throw new IllegalArgumentException("Invalid strategy: " + strategy);
         }
 
         // Ensure profit doesn't go below zero (or apply any other constraints if needed)
@@ -127,6 +147,9 @@ public class MarketCompetitionProblem extends AbstractProblem {
 
         return baseProfit;
     }
+
+
+
 
 
     @Override
@@ -140,4 +163,5 @@ public class MarketCompetitionProblem extends AbstractProblem {
 
         return solution;
     }
+
 }
