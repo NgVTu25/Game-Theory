@@ -23,30 +23,36 @@ public class Main {
         NondominatedPopulation population = algorithm.getResult();
 
         Solution bestSolution = null;
-        double bestScore = 0;
-
-        double weightMarketShare = 0.1;
-        double weightProfit = 0.1;
+        double bestProfit = Double.NEGATIVE_INFINITY;
+        int bestCompanyIndex = -1;
 
         for (Solution solution : population) {
-            double marketShare = -solution.getObjective(0);
-            double profit = -solution.getObjective(1);
-            double score = weightMarketShare * marketShare + weightProfit * profit;
-            if (score > bestScore) {
-                bestScore = score;
-                bestSolution = solution;
+            double[] profits = problem.getProfits(solution);
+            double totalProfit = 0;
+            for (int i = 0; i < profits.length; i++) {
+                for (double profit : profits) {
+                    totalProfit += profit;
+                }
+
+                if (profits[i] > bestProfit) {
+                    bestProfit = profits[i];
+                    bestSolution = solution;
+                    bestCompanyIndex = i;
+                }
             }
         }
 
         if (bestSolution != null) {
-            System.out.println("Company:");
+            System.out.println("Company strategies and profits:");
+            double[] profits = problem.getProfits(bestSolution);
             for (int i = 0; i < problem.getNumberOfVariables(); i++) {
-                System.out.print("Company " + (i + 1) + " strategies: " + EncodingUtils.getInt(bestSolution.getVariable(i)) + " ");
-                System.out.println();
+                System.out.println("Company " + (i + 1) + " strategy: " + EncodingUtils.getInt(bestSolution.getVariable(i)) + ", Profit: " + profits[i]);
             }
 
-            System.out.println("Market: " + -bestSolution.getObjective(0));
-            System.out.println("Profit: " + (-bestSolution.getObjective(1)));
+            System.out.println("Company with the highest profit:");
+            System.out.println("Company " + (bestCompanyIndex + 1) + " strategy: " + EncodingUtils.getInt(bestSolution.getVariable(bestCompanyIndex)));
+            System.out.println("Market Share: " + -bestSolution.getObjective(0));
+            System.out.println("Profit: " + bestProfit);
         }
     }
 }

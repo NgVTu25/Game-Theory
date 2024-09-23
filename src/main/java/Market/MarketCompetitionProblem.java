@@ -177,6 +177,27 @@ public class MarketCompetitionProblem extends AbstractProblem {
         return baseProfit;
     }
 
+    public double[] getProfits(Solution solution) {
+        int[] strategies = new int[Number_Of_Company];
+        for (int i = 0; i < Number_Of_Company; i++) {
+            strategies[i] = EncodingUtils.getInt(solution.getVariable(i));
+        }
+
+        double[] marketShares = new double[Number_Of_Company];
+        Arrays.fill(marketShares, Initial_Market_Share);
+
+        for (int i = 0; i < Number_Of_Company; i++) {
+            marketShares[i] = calculateMarketShare(strategies[i], marketShares, i);
+        }
+
+        double[] profits = new double[Number_Of_Company];
+        for (int i = 0; i < Number_Of_Company; i++) {
+            profits[i] = calculateProfit(marketShares[i], strategies[i]);
+        }
+
+        return profits;
+    }
+
     @Override
     public Solution newSolution() {
         Solution solution = new Solution(Number_Of_Company, Number_Of_Company * 2);
