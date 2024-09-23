@@ -9,15 +9,13 @@ import java.util.Arrays;
 public class MarketCompetitionProblem extends AbstractProblem {
 
     public static final int Number_Of_Company = 4;
-
     public static final double Campaign = 0.1;
     public static final int No_Campaign = -5;
-    public static final double Discount = 0.05;
-    public static final double No_Discount = 0.1;
+    public static final double Discount = 0.15;
+    public static final double No_Discount = 0.05;
 
     public static final int CAMPAIGN_DISCOUNT = 0;
     public static final int NO_CAMPAIGN_DISCOUNT = 1;
-
     public static final int NO_CAMPAIGN_NO_DISCOUNT = 2;
     public static final int CAMPAIGN_NO_DISCOUNT = 3;
 
@@ -59,6 +57,15 @@ public class MarketCompetitionProblem extends AbstractProblem {
             marketShares[i] = calculateMarketShare(strategies[i], marketShares, i);
         }
 
+            // Cập nhật thị phần và lợi nhuận cho mỗi công ty sau mỗi lượt
+            for (int i = 0; i < Number_Of_Company; i++) {
+                marketShares[i] = calculateMarketShare(strategies[i], marketShares, i);
+            }
+
+            for (int i = 0; i < Number_Of_Company; i++) {
+                profits[i] = calculateProfit(marketShares[i], strategies[i]);
+            }
+
         // Set objectives (negative because it's a minimization problem)
         for (int i = 0; i < Number_Of_Company; i++) {
             profits[i] = calculateProfit(marketShares[i],strategies[i]);
@@ -74,27 +81,38 @@ public class MarketCompetitionProblem extends AbstractProblem {
         double adjustedMarketShare = currentMarketShares[companyIndex];
 
         // Adjust market share based on strategy
-        if (strategy == 0) { // Campaign and discount
-            adjustedMarketShare += Campaign * adjustedMarketShare + adjustedMarketShare * Discount + adjustedMarketShare;
-        } else if (strategy == 1) { // No Campaign and discount
-            adjustedMarketShare += No_Campaign + adjustedMarketShare * Discount;
-        } else if (strategy == 2) { // Discount only
-            adjustedMarketShare += adjustedMarketShare + No_Campaign;
-        } else if (strategy == 3) { // No Discount
-            adjustedMarketShare += -No_Discount * adjustedMarketShare + adjustedMarketShare * Campaign + adjustedMarketShare;
+        switch (strategy) {
+            case CAMPAIGN_DISCOUNT: // Campaign and discount
+                adjustedMarketShare += Campaign * adjustedMarketShare + adjustedMarketShare * Discount;
+                break;
+
+            case NO_CAMPAIGN_DISCOUNT: // No Campaign and discount
+                adjustedMarketShare += No_Campaign + adjustedMarketShare * Discount;
+                break;
+
+            case NO_CAMPAIGN_NO_DISCOUNT: // Discount only
+                adjustedMarketShare += adjustedMarketShare + No_Campaign;
+                break;
+
+            case CAMPAIGN_NO_DISCOUNT: // No Discount
+                adjustedMarketShare += -No_Discount * adjustedMarketShare + adjustedMarketShare * Campaign;
+                break;
+
+            default:
+                throw new IllegalArgumentException("Invalid strategy: " + strategy);
         }
+
 
         // Ensure market share doesn't exceed 100%
         double totalMarketShare = Arrays.stream(currentMarketShares).sum();
         double maxMarketShare = 100.0;
 
         // Calculate the new total market share if adjustedMarketShare is used
-        double newTotalMarketShare = totalMarketShare - currentMarketShares[companyIndex] + adjustedMarketShare;
 
         // If the new total market share exceeds 100%, adjust the individual market shares
         // If the new total market share exceeds 100%, adjust the individual market shares
-        if (newTotalMarketShare > maxMarketShare) {
-            double excess = newTotalMarketShare - maxMarketShare;
+        if (totalMarketShare > maxMarketShare) {
+            double excess = totalMarketShare - maxMarketShare;
 
             // Distribute the excess proportionally to other companies
             for (int i = 0; i < Number_Of_Company; i++) {
@@ -140,17 +158,12 @@ public class MarketCompetitionProblem extends AbstractProblem {
                 throw new IllegalArgumentException("Invalid strategy: " + strategy);
         }
 
-        // Ensure profit doesn't go below zero (or apply any other constraints if needed)
         if (baseProfit < 0) {
             baseProfit = 0;
         }
 
         return baseProfit;
     }
-
-
-
-
 
     @Override
     public Solution newSolution() {
