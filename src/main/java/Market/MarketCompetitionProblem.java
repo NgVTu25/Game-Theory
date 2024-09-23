@@ -8,12 +8,24 @@ import java.util.Arrays;
 
 public class MarketCompetitionProblem extends AbstractProblem {
 
+
+    // number of companies
     public static final int Number_Of_Company = 4;
+
+    // Increase market share, where do campaigns
     public static final double Campaign = 0.1;
+
+    // market share drop, where do campaigns
     public static final int No_Campaign = -5;
+
+    // % market share increase where to discount
     public static final double Discount = 0.15;
+
+    // % market share falls where discounts are made
     public static final double No_Discount = 0.05;
 
+
+    // Campaign strategy
     public static final int CAMPAIGN_DISCOUNT = 0;
     public static final int NO_CAMPAIGN_DISCOUNT = 1;
     public static final int NO_CAMPAIGN_NO_DISCOUNT = 2;

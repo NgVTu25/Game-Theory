@@ -26,7 +26,7 @@ public class Main {
         double bestScore = 0;
 
         double weightMarketShare = 0.1;
-        double weightProfit = 0.3;
+        double weightProfit = 0.1;
 
         for (Solution solution : population) {
             double marketShare = -solution.getObjective(0);
